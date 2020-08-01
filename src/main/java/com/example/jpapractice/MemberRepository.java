@@ -1,5 +1,6 @@
 package com.example.jpapractice;
 
+import com.example.jpapractice.domain.Member;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
