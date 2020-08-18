@@ -30,4 +30,31 @@ public class OrderSimpleApiController {
         return all;
     }
 
+
+    @GetMapping("/api/v2/simple-orders")
+    public List<SimpleOrderDto> orderV2() {
+        return orderRepository.findAllByString(new OrderSearch())
+                .stream()
+                .map(SimpleOrderDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Data
+    static class SimpleOrderDto {
+        private Long orderId;
+        private String name;
+        private LocalDateTime orderDate;
+        private OrderStatus orderStatus;
+        private Address address;
+
+        public SimpleOrderDto(Order o) {
+            orderId = o.getId();
+            name = o.getMember().getName();
+            orderDate = o.getOrderDatetime();
+            orderStatus = o.getStatus();
+            address = o.getDelivery().getAddress();
+        }
+    }
+
+
 }
