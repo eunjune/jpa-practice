@@ -1,4 +1,4 @@
-package com.example.jpapractice.repository;
+package com.example.jpapractice.repository.order.simplequery;
 
 import com.example.jpapractice.domain.Address;
 import com.example.jpapractice.domain.Order;
