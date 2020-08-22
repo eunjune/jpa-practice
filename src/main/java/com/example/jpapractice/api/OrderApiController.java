@@ -1,32 +1,29 @@
 package com.example.jpapractice.api;
 
-import com.example.jpapractice.domain.Address;
 import com.example.jpapractice.domain.Order;
 import com.example.jpapractice.domain.OrderItem;
-import com.example.jpapractice.domain.OrderStatus;
 import com.example.jpapractice.repository.OrderRepository;
 import com.example.jpapractice.repository.OrderSearch;
 import com.example.jpapractice.repository.order.query.OrderFlatDto;
 import com.example.jpapractice.repository.order.query.OrderItemQueryDto;
 import com.example.jpapractice.repository.order.query.OrderQueryDto;
 import com.example.jpapractice.repository.order.query.OrderQueryRepository;
-import lombok.Data;
-import lombok.Getter;
+import com.example.jpapractice.service.query.OrderDto;
+import com.example.jpapractice.service.query.OrderQueryService;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
 
 @RestController
 @RequiredArgsConstructor
 public class OrderApiController {
+
+    private final OrderQueryService orderQueryService;
 
     private final OrderRepository orderRepository;
 
@@ -59,11 +56,7 @@ public class OrderApiController {
 
     @GetMapping("/api/v3/orders")
     public List<OrderDto> ordersV3() {
-        List<Order> orders = orderRepository.findAllWithItem();
-        List<OrderDto> result = orders.stream()
-                .map(OrderDto::new)
-                .collect(toList());
-        return result;
+        return orderQueryService.ordersV3();
     }
 
     @GetMapping("/api/3.1/orders")
@@ -71,8 +64,8 @@ public class OrderApiController {
             @RequestParam(value = "offset", defaultValue = "0") int offset,
             @RequestParam(value = "offset", defaultValue = "100") int limit
         ) {
-        List<Order> orders = orderRepository.findAllWithMemberDelivery(offset,limit);
 
+        List<Order> orders = orderRepository.findAllWithMemberDelivery(offset,limit);
         List<OrderDto> result = orders.stream()
                 .map(OrderDto::new)
                 .collect(toList());
@@ -103,40 +96,5 @@ public class OrderApiController {
                 .collect(toList());
     }
 
-    @Data
-    static class OrderDto {
-
-        private Long orderId;
-        private String name;
-        private LocalDateTime orderDate;
-        private OrderStatus orderStatus;
-        private Address address;
-        private List<OrderItemDto> orderItems;
-
-        public OrderDto(Order order) {
-            orderId = order.getId();
-            name = order.getMember().getName();
-            orderDate = order.getOrderDatetime();
-            orderStatus = order.getStatus();
-            address = order.getDelivery().getAddress();
-            orderItems = order.getOrderItems().stream()
-                    .map(OrderItemDto::new)
-                    .collect(toList());
-        }
-    }
-
-    @Data
-    static class OrderItemDto {
-
-        private String itemName;
-        private int orderPrice;
-        private int count;
-
-        public OrderItemDto(OrderItem orderItem) {
-            itemName = orderItem.getItem().getName();
-            orderPrice = orderItem.getOrderPrice();
-            count = orderItem.getCount();
-        }
-    }
 }
 
